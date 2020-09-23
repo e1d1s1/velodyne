@@ -181,6 +181,7 @@ private:
     double min_range;             ///< minimum range to publish
     int min_angle;                ///< minimum angle to publish
     int max_angle;                ///< maximum angle to publish
+    bool is_dual_return_mode;
 
     double tmp_min_angle;
     double tmp_max_angle;
@@ -204,7 +205,7 @@ private:
    * 
    *  NOTE: Does not support all sensors yet (vlp16, vlp32, and hdl32 are currently supported)
    */
-  bool buildTimings();
+  bool buildTimings(bool dual = false);
 
   /** add private function to handle the VLP16 **/
   void unpack_vlp16(const velodyne_msgs::VelodynePacket& pkt, DataContainerBase& data,

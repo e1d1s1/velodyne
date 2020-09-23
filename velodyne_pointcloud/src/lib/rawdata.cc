@@ -92,7 +92,7 @@ inline float SQR(float val) { return val*val; }
   /**
    * Build a timing table for each block/firing. Stores in timing_offsets vector
    */
-  bool RawData::buildTimings(){
+  bool RawData::buildTimings(bool dual_mode){
     // vlp16    
     if (config_.model == "VLP16"){
       // timing table calculation, from velodyne user manual
@@ -104,7 +104,6 @@ inline float SQR(float val) { return val*val; }
       double full_firing_cycle = 55.296 * 1e-6; // seconds
       double single_firing = 2.304 * 1e-6; // seconds
       double dataBlockIndex, dataPointIndex;
-      bool dual_mode = false;
       // compute timing offsets
       for (size_t x = 0; x < timing_offsets.size(); ++x){
         for (size_t y = 0; y < timing_offsets[x].size(); ++y){
@@ -131,7 +130,6 @@ inline float SQR(float val) { return val*val; }
       double full_firing_cycle = 55.296 * 1e-6; // seconds
       double single_firing = 2.304 * 1e-6; // seconds
       double dataBlockIndex, dataPointIndex;
-      bool dual_mode = false;
       // compute timing offsets
       for (size_t x = 0; x < timing_offsets.size(); ++x){
         for (size_t y = 0; y < timing_offsets[x].size(); ++y){
@@ -157,7 +155,6 @@ inline float SQR(float val) { return val*val; }
       double full_firing_cycle = 46.080 * 1e-6; // seconds
       double single_firing = 1.152 * 1e-6; // seconds
       double dataBlockIndex, dataPointIndex;
-      bool dual_mode = false;
       // compute timing offsets
       for (size_t x = 0; x < timing_offsets.size(); ++x){
         for (size_t y = 0; y < timing_offsets[x].size(); ++y){
@@ -197,7 +194,8 @@ inline float SQR(float val) { return val*val; }
   boost::optional<velodyne_pointcloud::Calibration> RawData::setup(ros::NodeHandle private_nh)
   {
     private_nh.param("model", config_.model, std::string("64E"));
-    buildTimings();
+    private_nh.param("dual_return_mode", config_.is_dual_return_mode, false);
+    buildTimings(config_.is_dual_return_mode);
 
     // get path to angles.config file for this device
     if (!private_nh.getParam("calibration", config_.calibrationFile))

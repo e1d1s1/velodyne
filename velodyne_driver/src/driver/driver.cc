@@ -60,6 +60,8 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
 
   // get model name, validate string, determine packet rate
   private_nh.param("model", config_.model, std::string("64E"));
+  private_nh.param("dual_return_mode", config_.is_dual_return_mode, false);
+
   double packet_rate;                   // packet frequency (Hz)
   std::string model_full_name;
   if ((config_.model == "64E_S2") || 
@@ -80,17 +82,20 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
     }
   else if (config_.model == "32E")
     {
-      packet_rate = 1808.0;
+      const double PRATE_32E = 1808.0;
+      packet_rate = config_.is_dual_return_mode ? PRATE_32E * 2 : PRATE_32E;
       model_full_name = std::string("HDL-") + config_.model;
     }
     else if (config_.model == "32C")
     {
-      packet_rate = 1507.0;
+      const double PRATE_32C = 1507.0;
+      packet_rate = config_.is_dual_return_mode ? PRATE_32C * 2 : PRATE_32C;
       model_full_name = std::string("VLP-") + config_.model;
     }
   else if (config_.model == "VLP16")
     {
-      packet_rate = 754;             // 754 Packets/Second for Last or Strongest mode 1508 for dual (VLP-16 User Manual)
+      const double PRATE_VLP16 = 754; // 754 Packets/Second for Last or Strongest mode 1508 for dual (VLP-16 User Manual)
+      packet_rate = config_.is_dual_return_mode ? PRATE_VLP16 * 2 : PRATE_VLP16;  
       model_full_name = "VLP-16";
     }
   else
@@ -98,6 +103,7 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
       ROS_ERROR_STREAM("unknown Velodyne LIDAR model: " << config_.model);
       packet_rate = 2600.0;
     }
+
   std::string deviceName(std::string("Velodyne ") + model_full_name);
 
   private_nh.param("rpm", config_.rpm, 600.0);
